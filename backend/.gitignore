@@ -1,4 +1,3 @@
-
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -10,5 +9,44 @@
 ###< symfony/framework-bundle ###
 
 ###> lexik/jwt-authentication-bundle ###
-
+/config/jwt/private.pem
+/config/jwt/public.pem
 ###< lexik/jwt-authentication-bundle ###
+
+# Fichiers de sécurité sensibles
+.env
+.env.prod
+.env.test
+
+# Logs
+/var/log/
+*.log
+
+# Cache
+/var/cache/
+
+# Sessions
+/var/sessions/
+
+# Base de données locale
+*.sqlite
+*.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Node modules (si vous utilisez des assets)
+/node_modules/
+/public/build/
+
+# Images uploadées (optionnel selon votre config)
+/public/uploads/

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Bienvenue sur GamePoint</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin: 20px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            max-width: 150px;
+            height: auto;
+        }
+        .welcome-title {
+            color: #007bff;
+            font-size: 28px;
+            margin: 20px 0;
+        }
+        .user-info {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <img src="cid:logo" alt="GamePoint Logo" class="logo">
+            <h1 class="welcome-title">Bienvenue {{ firstname }} ! 🎮</h1>
+        </div>
+        
+        <div class="content">
+            <p>Félicitations ! Votre compte <strong>GamePoint</strong> a été créé avec succès.</p>
+            
+            <div class="user-info">
+                <h3>📋 Vos informations :</h3>
+                <p><strong>Nom :</strong> {{ firstname }} {{ lastname }}</p>
+                <p><strong>Email :</strong> {{ email }}</p>
+                {# <p><strong>Date d'inscription :</strong> {{ created_at|date('d/m/Y à H:i') }}</p> #}
+            </div>
+            
+            <p>🎯 Vous pouvez maintenant :</p>
+            <ul>
+                <li>Gagner des points de fidélité</li>
+                <li>Participer aux campagnes</li>
+                <li>Échanger vos points contre des récompenses</li>
+            </ul>
+            
+            <p style="text-align: center;">
+                <a href="#" class="btn">Découvrir GamePoint</a>
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>Merci de rejoindre l'aventure GamePoint ! 🚀</p>
+            <p><small>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</small></p>
+        </div>
+    </div>
+</body>
+</html>
