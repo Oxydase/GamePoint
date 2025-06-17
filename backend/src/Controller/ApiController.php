@@ -2,23 +2,24 @@
 
 namespace App\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class ApiController extends AbstractController
 {
-    #[Route('api/home', name: 'app_home')]
-    public function home(TokenStorageInterface $tokenStorage): JsonResponse
+    #[Route('/api/me', name: 'api_me', methods: ['GET'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function me(): JsonResponse
     {
-        $token = $tokenStorage->getToken();
-
-        $user = $token->getUser();
+        $user = $this->getUser();
 
         return $this->json([
-            'message' => sprintf('Welcome to your new controller %s!', $user->getEmail()),
-            'path' => 'src/Controller/HomeController.php',
+            'email' => $user->getEmail(),
+            'lastname' => $user->getLastname(),
+            'firstname' => $user->getFirstname(),
+            'phone' => $user->getPhone(),
         ]);
     }
 }
