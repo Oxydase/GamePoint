@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Ramsey\Uuid\Uuid; 
 
 #[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé')]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -100,6 +101,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         $this->createdAt = new \DateTime();
         $this->roles = ['ROLE_USER'];
+
+        // qrcode 
+        $this->qrCode = Uuid::uuid4()->toString();
     }
 
     public function getId(): ?int
