@@ -117,7 +117,11 @@ final class AuthController extends AbstractController
 
         return $this->json([
             'qr_Code_data' => $user->getQrCode(),
-            'qr_code_image' => 'data:image/png;base64,' . $qrCodeImage
+            'qr_code_image' => 'data:image/png;base64,' . $qrCodeImage,
+            'user' => [
+            'firstname' => $user->getFirstname(),
+            'lastname' => $user->getLastname()
+        ]
         ]);
     }
 }
