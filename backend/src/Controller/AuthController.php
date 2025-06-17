@@ -19,6 +19,9 @@ use Twig\Environment;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\File;
 
+
+use App\Service\QrCodeService;
+
 final class AuthController extends AbstractController
 {
     #[Route('/api/register', name: 'app_register', methods: ['POST'])]
@@ -97,4 +100,28 @@ final class AuthController extends AbstractController
         ], 201);
     }
 
+
+    #[Route('/api/user/qr-code', name: 'api_user_qr_code', methods: ['GET'])]
+    public function getUserQrCode(QrCodeService $qrCodeService): JsonResponse
+    {
+      
+        $user = $this-> getUser();
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur non authentifié'], 401);
+
+        }
+
+        $qrCodeImage = $qrCodeService->generateQrCodeImage(
+            $user->getQrCode()
+        );
+
+        return $this->json([
+            'qr_Code_data' => $user->getQrCode(),
+            'qr_code_image' => 'data:image/png;base64,' . $qrCodeImage,
+            'user' => [
+            'firstname' => $user->getFirstname(),
+            'lastname' => $user->getLastname()
+        ]
+        ]);
+    }
 }
