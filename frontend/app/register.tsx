@@ -23,6 +23,7 @@ export default function RegisterScreen() {
 
     try {
       const response = await axios.post('http://gamepoint-app.alwaysdata.net/api/register', {
+
         email,
         password,
         lastname,
