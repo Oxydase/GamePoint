@@ -1,11 +1,52 @@
 import { useState } from 'react';
-import { View, TextInput, Text, TouchableOpacity, StyleSheet, Switch } from 'react-native';
+import { View, TextInput, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import Header from '../components/Header';
+import axios from 'axios';
 
 export default function RegisterScreen() {
-  const [isMerchant, setIsMerchant] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [lastname, setLastname] = useState('');
+  const [firstname, setFirstname] = useState('');
+  const [phone, setPhone] = useState('');
+
   const router = useRouter();
+
+  const handleRegister = async () => {
+    if (!email || !password || !lastname || !firstname) {
+      Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
+      return;
+    }
+
+    console.log(email, password,lastname,firstname,phone);
+
+    try {
+      const response = await axios.post('http://192.168.0.31:8000/api/register', {
+        email,
+        password,
+        lastname,
+        firstname,
+        phone,
+      });
+
+      if (response.status !== 201) {
+        Alert.alert('Erreur', response.data.error || response.data.erros || 'Erreur lors de l\'inscription');
+        return;
+      }
+
+      Alert.alert('Succès', response.data.message, [
+        { text: 'OK', onPress: () => router.push('/login') }
+      ]);
+    } catch (error: any) {
+      console.error('Register error:', error);
+      if (error.response?.data) {
+        Alert.alert('Erreur', error.response.data.error || 'Erreur lors de l\'inscription');
+      } else {
+        Alert.alert('Erreur', 'Une erreur est survenue');
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -21,22 +62,37 @@ export default function RegisterScreen() {
           style={styles.input}
           keyboardType="email-address"
           autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
         />
         <TextInput
           placeholder="Mot de passe"
           style={styles.input}
           secureTextEntry
+          value={password}
+          onChangeText={setPassword}
         />
         <TextInput
           placeholder="Nom"
           style={styles.input}
+          value={lastname}
+          onChangeText={setLastname}
         />
         <TextInput
           placeholder="Prénom"
           style={styles.input}
+          value={firstname}
+          onChangeText={setFirstname}
+        />
+        <TextInput
+          placeholder="Téléphone"
+          style={styles.input}
+          keyboardType="phone-pad"
+          value={phone}
+          onChangeText={setPhone}
         />
 
-        <View style={styles.switchContainer}>
+        {/* <View style={styles.switchContainer}>
           <Switch
             value={isMerchant}
             onValueChange={setIsMerchant}
@@ -49,9 +105,9 @@ export default function RegisterScreen() {
               Vous êtes un commerçant et souhaitez référencer votre boutique
             </Text>
           </View>
-        </View>
+        </View> */}
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>S’inscrire</Text>
         </TouchableOpacity>
       </View>
@@ -65,37 +121,20 @@ const styles = StyleSheet.create({
   backButtonText: { fontSize: 16, color: '#333' },
   content: { flex: 1, padding: 20 },
   pageTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
-   input: {
-  borderWidth: 1,
-  borderColor: '#ccc',
-  borderRadius: 8,
-  padding: 15,
-  marginBottom: 15,
-  backgroundColor: '#fff', 
-  color: '#00x',           
-  fontSize: 16,
-},
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    color: '#000',
+    fontSize: 16,
+  },
   button: {
     backgroundColor: '#333',
     padding: 15,
     borderRadius: 8,
   },
   buttonText: { color: '#fff', textAlign: 'center', fontWeight: 'bold' },
-  switchContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 20,
-  },
-  labelContainer: {
-    marginLeft: 10,
-    flexShrink: 1,
-  },
-  labelBold: {
-    fontWeight: 'bold',
-    marginBottom: 2,
-  },
-  labelSmall: {
-    fontSize: 12,
-    color: '#555',
-  },
 });

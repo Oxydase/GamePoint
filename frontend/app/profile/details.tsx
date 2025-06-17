@@ -1,12 +1,46 @@
-import { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import Header from '../../components/Header';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 export default function ProfileDetails() {
   const router = useRouter();
-  const [user, setUser] = useState({ nom: 'Dupont', prenom: 'Jean', email: 'jean@mail.com', telephone: '0600000000' });
-  const handleSave = () => alert('Modifications enregistrées (mock)');
+  const [user, setUser] = useState({ nom: '', prenom: '', email: '', telephone: '' });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = await AsyncStorage.getItem('jwt');
+        if (!token) return;
+
+        const res = await axios.get('http://192.168.0.31:8000/api/me', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = res.data;
+        setUser({
+          nom: data.lastname || '',
+          prenom: data.firstname || '',
+          email: data.email || '',
+          telephone: data.phone || '',
+        });
+      } catch (error) {
+        console.error('Erreur récupération profil', error);
+        Alert.alert('Erreur', 'Impossible de récupérer les données du profil.');
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const handleSave = () => {
+    Alert.alert('Info', 'Modifications enregistrées (mock)');
+  };
+
   return (
     <View style={styles.container}>
       <Header />
@@ -33,7 +67,8 @@ export default function ProfileDetails() {
 }
 
 const styles = StyleSheet.create({
- 
+  container: { flex: 1 },
+  inner: { padding: 20 },
   back: { marginBottom: 10 },
   backText: { fontSize: 24 },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 20 },

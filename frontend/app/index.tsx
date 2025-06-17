@@ -23,11 +23,12 @@ export default function IndexScreen() {
       </View>
 
       {/* BOUTON VERS HOME */}
-      <View style={styles.bottomButtonContainer}>
+      {/* MODIF MILTON ACCEDEZ A LA HOME SEULEMENT SI CONNECTE ? */}
+      {/* <View style={styles.bottomButtonContainer}>
         <TouchableOpacity style={styles.secondaryButton} onPress={() => router.push('/home')}>
           <Text style={styles.secondaryButtonText}>Accéder à la Home</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   );
 }
