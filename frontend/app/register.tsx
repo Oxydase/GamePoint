@@ -22,7 +22,7 @@ export default function RegisterScreen() {
     console.log(email, password,lastname,firstname,phone);
 
     try {
-      const response = await axios.post('http://192.168.0.31:8000/api/register', {
+      const response = await axios.post('http://gamepoint-app.alwaysdata.net/api/register', {
         email,
         password,
         lastname,
