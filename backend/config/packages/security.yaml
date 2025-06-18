@@ -38,6 +38,7 @@ security:
         - { path: ^/api/register, roles: PUBLIC_ACCESS } 
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/scan, roles: ROLE_MERCHANT }
+        - { path: ^/api/validate-reward, roles: ROLE_MERCHANT } 
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
