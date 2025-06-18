@@ -37,8 +37,39 @@ export default function ProfileDetails() {
     fetchProfile();
   }, []);
 
-  const handleSave = () => {
-    Alert.alert('Info', 'Modifications enregistrées (mock)');
+  const handleSave = async () => {
+    try {
+      const token = await AsyncStorage.getItem('jwt');
+      if (!token) {
+        Alert.alert('Erreur', 'Non connecté');
+        return;
+      }
+
+      await axios.put(
+        'http://gamepoint-app.alwaysdata.net/api/me',
+        {
+          firstname: user.prenom,
+          lastname: user.nom,
+          email: user.email,
+          phone: user.telephone,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      Alert.alert('Succès', 'Profil mis à jour avec succès');
+    } catch (error: any) {
+      console.error('Erreur mise à jour profil :', error);
+      if (error.response?.data?.message) {
+        Alert.alert('Erreur', error.response.data.message);
+      } else {
+        Alert.alert('Erreur', 'Une erreur est survenue.');
+      }
+    }
   };
 
   return (
