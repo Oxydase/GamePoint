@@ -2,9 +2,16 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import Header from '../../components/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from 'react';
+import {jwtDecode} from 'jwt-decode';
 
 export default function ProfileMenu() {
   const router = useRouter();
+
+  interface DecodedToken {
+    roles: string[];
+  }
+  const [isMerchant, setIsMerchant] = useState(false);
 
   const items = [
     { title: 'Mon profil', subtitle: 'Nom, prénom, adresse, numéro de téléphone...', route: '/profile/details' },
@@ -25,6 +32,24 @@ export default function ProfileMenu() {
     }
   };
 
+  useEffect(() => {
+  const checkRole = async () => {
+    const token = await AsyncStorage.getItem('jwt');
+    if (token) {
+      try {
+        const decoded: DecodedToken = jwtDecode(token);
+        if (decoded.roles.includes('ROLE_MERCHANT')) {
+          setIsMerchant(true);
+        }
+      } catch (error) {
+        console.error('Erreur décodage JWT :', error);
+      }
+    }
+  };
+
+  checkRole();
+}, []);
+
   return (
     <View style={styles.container}>
       <Header />
@@ -38,6 +63,16 @@ export default function ProfileMenu() {
           <Text style={styles.subtitle}>{item.subtitle}</Text>
         </TouchableOpacity>
       ))}
+
+      {isMerchant && (
+        <TouchableOpacity
+          onPress={() => router.push('/boutique/create-store')}
+          style={[styles.item, { backgroundColor: '#e8f5e9' }]}
+        >
+          <Text style={styles.title}>Créer ma boutique</Text>
+          <Text style={styles.subtitle}>Accéder à l’espace commerçant</Text>
+        </TouchableOpacity>
+      )}
 
       <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
         <Text style={styles.logoutText}>Se déconnecter</Text>
