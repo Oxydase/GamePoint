@@ -75,6 +75,12 @@ export default function ManageRewards() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Header />
+
+      {/* Flèche retour */}
+      <TouchableOpacity style={styles.back} onPress={() => router.back()}>
+        <Text style={styles.backText}>←</Text>
+      </TouchableOpacity>
+
       <Text style={styles.title}>Mes récompenses</Text>
 
       <TouchableOpacity
@@ -118,6 +124,15 @@ export default function ManageRewards() {
 
 const styles = StyleSheet.create({
   container: { paddingBottom: 40 },
+  back: {
+    paddingHorizontal: 20,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  backText: {
+    fontSize: 24,
+    color: '#333',
+  },
   title: {
     fontSize: 22,
     fontWeight: 'bold',

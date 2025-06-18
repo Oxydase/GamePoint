@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
@@ -11,12 +11,10 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Header from '../components/Header';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 export default function AddReward() {
   const router = useRouter();
-  const params = useLocalSearchParams();
-
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -24,37 +22,7 @@ export default function AddReward() {
     image: '',
   });
 
-  const isEditing = params.edit === 'true';
-
-  // 🔒 Simule un utilisateur connecté commerçant
-  const user = {
-    role: 'commercant', // → à remplacer par un useAuth() ou contexte utilisateur
-    isValidated: true,
-    boutiqueId: 1,
-  };
-
-  // 🔐 Vérifie que seul un commerçant validé peut accéder
-  useEffect(() => {
-    if (user.role !== 'commercant' || !user.isValidated) {
-      Alert.alert(
-        'Accès refusé',
-        'Seuls les commerçants validés peuvent ajouter des récompenses.'
-      );
-      router.push('/');
-    }
-  }, []);
-
-  // Pré-remplit si modification
-  useEffect(() => {
-    if (isEditing) {
-      setForm({
-        title: params.title || '',
-        description: params.description || '',
-        price: params.price?.toString() || '',
-        image: params.image || '',
-      });
-    }
-  }, [params]);
+  const mockBoutiqueId = 1; // 👉 à remplacer par l’ID de la boutique réelle
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -75,43 +43,21 @@ export default function AddReward() {
       return;
     }
 
-    try {
-      if (isEditing) {
-        // ✅ PUT (modifier récompense)
-        // await fetch(`https://api.tonapp.com/rewards/${params.id}`, {
-        //   method: 'PUT',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({
-        //     ...form,
-        //     price: parseInt(form.price),
-        //   }),
-        // });
-        Alert.alert('Succès', 'Récompense modifiée.');
-      } else {
-        // ✅ POST (créer récompense)
-        // await fetch(`https://api.tonapp.com/boutiques/${user.boutiqueId}/rewards`, {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({
-        //     ...form,
-        //     price: parseInt(form.price),
-        //   }),
-        // });
-        Alert.alert('Succès', 'Récompense ajoutée.');
-      }
-
-      router.push('/manage-rewards');
-    } catch (error) {
-      Alert.alert('Erreur', 'Une erreur est survenue.');
-    }
+    // ✅ À remplacer par ton API Symfony
+    Alert.alert('Récompense ajoutée 🎉');
+    router.push('/');
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Header />
-      <Text style={styles.title}>
-        {isEditing ? 'Modifier une récompense' : 'Ajouter une récompense'}
-      </Text>
+
+      {/* Flèche retour */}
+      <TouchableOpacity style={styles.back} onPress={() => router.back()}>
+        <Text style={styles.backText}>←</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.title}>Ajouter une récompense</Text>
 
       <TextInput
         placeholder="Nom de la récompense"
@@ -136,7 +82,7 @@ export default function AddReward() {
       />
 
       <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
-        <Text style={styles.imagePickerText}>Choisir une image</Text>
+        <Text style={styles.imagePickerText}>📸 Choisir une image</Text>
       </TouchableOpacity>
 
       {form.image !== '' && (
@@ -144,9 +90,7 @@ export default function AddReward() {
       )}
 
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>
-          {isEditing ? 'Enregistrer les modifications' : 'Ajouter la récompense'}
-        </Text>
+        <Text style={styles.buttonText}>Ajouter la récompense</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -154,12 +98,20 @@ export default function AddReward() {
 
 const styles = StyleSheet.create({
   container: { paddingBottom: 40 },
+  back: {
+    paddingHorizontal: 20,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  backText: {
+    fontSize: 24,
+    color: '#333',
+  },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
     paddingHorizontal: 20,
-    fontFamily: 'Poppins-Bold',
   },
   input: {
     borderWidth: 1,
@@ -170,7 +122,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     color: '#000',
     marginHorizontal: 20,
-    fontFamily: 'Poppins',
   },
   imagePicker: {
     marginHorizontal: 20,
@@ -183,7 +134,6 @@ const styles = StyleSheet.create({
   imagePickerText: {
     color: '#333',
     fontWeight: 'bold',
-    fontFamily: 'Poppins',
   },
   imagePreview: {
     height: 180,
@@ -198,10 +148,5 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginHorizontal: 20,
   },
-  buttonText: {
-    color: 'white',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontFamily: 'Poppins',
-  },
+  buttonText: { color: 'white', textAlign: 'center', fontWeight: 'bold' },
 });

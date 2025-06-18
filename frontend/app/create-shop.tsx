@@ -10,17 +10,32 @@ import {
   Image,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import Header from '../components/Header';
 
-export default function CreateShop() {
+export default function CreateOrEditShop() {
   const router = useRouter();
+  const params = useLocalSearchParams();
+
+  const editMode = params.edit === 'true';
+
   const [form, setForm] = useState({
     name: '',
     address: '',
     phone: '',
     cover: '',
   });
+
+  useEffect(() => {
+    if (editMode) {
+      setForm({
+        name: params.name as string || '',
+        address: params.address as string || '',
+        phone: params.phone as string || '',
+        cover: params.cover as string || '',
+      });
+    }
+  }, [editMode, params]);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -36,16 +51,32 @@ export default function CreateShop() {
   };
 
   const handleSubmit = async () => {
-    // Simulation : ici tu peux remplacer par un appel POST vers l'API
-    // avec upload d'image + infos
-    Alert.alert('Succès', 'Boutique créée et en attente de validation');
+    if (!form.name || !form.address || !form.phone) {
+      Alert.alert('Erreur', 'Merci de remplir tous les champs');
+      return;
+    }
+
+    if (editMode) {
+      Alert.alert('Succès', 'Boutique modifiée avec succès');
+    } else {
+      Alert.alert('Succès', 'Boutique créée et en attente de validation');
+    }
+
     router.push('/');
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Header />
-      <Text style={styles.title}>Créer ma boutique</Text>
+
+      {/* Flèche retour */}
+      <TouchableOpacity style={styles.back} onPress={() => router.back()}>
+        <Text style={styles.backText}>←</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.title}>
+        {editMode ? 'Modifier ma boutique' : 'Créer ma boutique'}
+      </Text>
 
       <TextInput
         placeholder="Nom du magasin"
@@ -80,7 +111,9 @@ export default function CreateShop() {
       )}
 
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Créer la boutique</Text>
+        <Text style={styles.buttonText}>
+          {editMode ? 'Enregistrer les modifications' : 'Créer la boutique'}
+        </Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -88,7 +121,21 @@ export default function CreateShop() {
 
 const styles = StyleSheet.create({
   container: { paddingBottom: 40 },
-  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 20, paddingHorizontal: 20 },
+  back: {
+    paddingHorizontal: 20,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  backText: {
+    fontSize: 24,
+    color: '#333',
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',

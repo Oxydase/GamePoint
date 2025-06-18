@@ -1,4 +1,4 @@
-{
+{ 
   "expo": {
     "name": "frontend",
     "slug": "frontend",
@@ -34,8 +34,7 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ],
-      "expo-barcode-scanner"
+      ]
     ],
     "experiments": {
       "typedRoutes": true
