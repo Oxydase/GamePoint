@@ -44,6 +44,11 @@ final class AuthController extends AbstractController
         $user->setLastname($data['lastname']);
         $user->setPhone($data['phone']?? null);
 
+        if (!empty($data['is_merchant'])) {
+            $user->setRoles(['ROLE_USER', 'ROLE_MERCHANT']);
+        } else {
+            $user->setRoles(['ROLE_USER']);
+        }
         // hash du mot de passe
         $hashedPassword = $passwordHasher->hashPassword(
             $user, 
