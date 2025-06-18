@@ -97,10 +97,14 @@ export default function HomeScreen() {
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {shops.map((shop) => (
-                <View key={shop.id} style={styles.circleContainer}>
+                <TouchableOpacity
+                  key={shop.id}
+                  style={styles.circleContainer}
+                  onPress={() => router.push(`/boutique/${shop.id}`)}
+                >
                   <Image source={{ uri: shop.image }} style={styles.circle} />
                   <Text style={styles.circleText}>{shop.name}</Text>
-                </View>
+                </TouchableOpacity>
               ))}
             </ScrollView>
           </View>
