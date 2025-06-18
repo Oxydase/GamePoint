@@ -19,9 +19,7 @@
     "@react-navigation/native": "^7.1.6",
     "axios": "^1.9.0",
     "expo": "~53.0.11",
-    "expo-barcode-scanner": "^13.0.1",
     "expo-blur": "~14.1.5",
-    "expo-camera": "~16.1.8",
     "expo-constants": "~17.1.6",
     "expo-font": "~13.3.1",
     "expo-haptics": "~14.1.4",
@@ -34,6 +32,7 @@
     "expo-symbols": "~0.4.5",
     "expo-system-ui": "~5.0.8",
     "expo-web-browser": "~14.1.6",
+    "jwt-decode": "^4.0.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.3",
@@ -45,7 +44,8 @@
     "react-native-svg": "15.11.2",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.20.0",
-    "react-native-webview": "13.13.5"
+    "react-native-webview": "13.13.5",
+    "expo-camera": "~16.1.8"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

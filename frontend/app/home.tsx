@@ -88,6 +88,13 @@ export default function HomeScreen() {
             />
           </View>
 
+          <TouchableOpacity
+            style={styles.scanButton}
+            onPress={() => router.push('/scanqr')}
+          >
+            <Text style={styles.scanButtonText}>Scanner un QR Code</Text>
+          </TouchableOpacity>
+
           {/* Boutiques partenaires */}
           <View style={styles.section}>
             <View style={styles.row}>
@@ -172,5 +179,18 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 210,
     borderRadius: 10,
+  },
+  scanButton: {
+  backgroundColor: '#F0180C',
+  marginHorizontal: 20,
+  paddingVertical: 15,
+  borderRadius: 10,
+  alignItems: 'center',
+  marginBottom: 20,
+  },
+  scanButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });

@@ -3,6 +3,7 @@ import { View, TextInput, Text, TouchableOpacity, StyleSheet, Alert } from 'reac
 import { useRouter } from 'expo-router';
 import Header from '../components/Header';
 import axios from 'axios';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function RegisterScreen() {
   const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ export default function RegisterScreen() {
   const [lastname, setLastname] = useState('');
   const [firstname, setFirstname] = useState('');
   const [phone, setPhone] = useState('');
+  const [isMerchant, setIsMerchant] = useState(false);
 
   const router = useRouter();
 
@@ -23,13 +25,14 @@ export default function RegisterScreen() {
 
     try {
       const response = await axios.post('http://gamepoint-app.alwaysdata.net/api/register', {
-
         email,
         password,
         lastname,
         firstname,
         phone,
+        is_merchant: isMerchant
       });
+
 
       if (response.status !== 201) {
         Alert.alert('Erreur', response.data.error || response.data.erros || 'Erreur lors de l\'inscription');
@@ -93,20 +96,26 @@ export default function RegisterScreen() {
           onChangeText={setPhone}
         />
 
-        {/* <View style={styles.switchContainer}>
-          <Switch
-            value={isMerchant}
-            onValueChange={setIsMerchant}
-            trackColor={{ false: '#ccc', true: '#0a84ff' }}
-            thumbColor={isMerchant ? '#fff' : '#f4f3f4'}
+        <TouchableOpacity
+          onPress={() => setIsMerchant(!isMerchant)}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 15,
+          }}
+        >
+          <MaterialIcons
+            name={isMerchant ? 'check-box' : 'check-box-outline-blank'}
+            size={24}
+            color="#0a84ff"
           />
-          <View style={styles.labelContainer}>
-            <Text style={styles.labelBold}>Commerçant</Text>
-            <Text style={styles.labelSmall}>
+          <View style={{ marginLeft: 10 }}>
+            <Text style={{ fontWeight: 'bold' }}>Commerçant</Text>
+            <Text style={{ fontSize: 12, color: '#555' }}>
               Vous êtes un commerçant et souhaitez référencer votre boutique
             </Text>
           </View>
-        </View> */}
+        </TouchableOpacity>
 
         <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>S’inscrire</Text>
