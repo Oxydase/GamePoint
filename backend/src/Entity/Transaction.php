@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\TransactionRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
 class Transaction
@@ -21,14 +22,14 @@ class Transaction
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $operationType = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $pointAmount = null;
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $pointAmount = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTime $createdAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Reward $reward = null;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]

@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Ramsey\Uuid\Uuid; 
+use App\Entity\Shop;
 
 #[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé')]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -67,6 +68,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(nullable: true)]
     private ?\DateTime $updatedAt = null;
+
+    #[ORM\ManyToOne(targetEntity: Shop::class)]
+    #[ORM\JoinColumn(name: 'shop_id', referencedColumnName: 'id', nullable: true)]
+    private ?Shop $shop = null;
 
     /**
      * @var Collection<int, Transaction>
@@ -380,6 +385,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
 
+        return $this;
+    }
+
+
+
+        public function getShop(): ?Shop
+    {
+        return $this->shop;
+    }
+
+    public function setShop(?Shop $shop): static
+    {
+        $this->shop = $shop;
         return $this;
     }
 }

@@ -30,10 +30,14 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+    role_hierarchy:
+        ROLE_MERCHANT: ROLE_USER
+        ROLE_ADMIN: [ROLE_MERCHANT, ROLE_USER]
 
     access_control:
         - { path: ^/api/register, roles: PUBLIC_ACCESS } 
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/scan, roles: ROLE_MERCHANT }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:

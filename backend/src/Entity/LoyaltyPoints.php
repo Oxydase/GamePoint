@@ -14,7 +14,7 @@ class LoyaltyPoints
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::BIGINT, nullable: true)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $pointsBalance = null;
 
     #[ORM\Column(nullable: true)]
