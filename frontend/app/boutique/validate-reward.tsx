@@ -75,7 +75,7 @@ export default function ValidateReward() {
       
       console.log('🔄 Validation récompense:', rewardCode);
 
-      const response = await axios.post('http://172.20.10.2:8000/api/validate-reward', {
+      const response = await axios.post('http://192.168.0.31:8000/api/validate-reward', {
         reward_code: rewardCode
       }, {
         headers: {

@@ -94,7 +94,7 @@ export default function TransactionPage() {
 
       // Appel à l'API scan
 
-      const response = await axios.post('http://gamepoint-app.alwaysdata.net/api/scan', {
+      const response = await axios.post('http://192.168.0.31:8000/api/scan', {
 
         qr_code_data: finalQrCode,
         operation_type: operationType.trim(),

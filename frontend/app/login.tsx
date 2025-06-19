@@ -13,7 +13,7 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     try {
 
-      const response = await axios.post('http://172.20.10.2:8000/api/login_check', {
+      const response = await axios.post('http://192.168.0.31:8000/api/login_check', {
       // const response = await axios.post('http://gamepoint-app.alwaysdata.net/api/login_check', {
 
         email: email,  // comme dans security.yaml

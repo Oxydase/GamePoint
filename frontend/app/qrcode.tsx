@@ -35,7 +35,7 @@ export default function QRCodeClient() {
       }
 
       // Appel 'API 
-      const response = await axios.get('http://172.20.10.2:8000/api/user/qr-code', {
+      const response = await axios.get('http://192.168.0.31:8000/api/user/qr-code', {
       // const response = await axios.get('http://gamepoint-app.alwaysdata.net/api/user/qr-code', {
         headers: {
           'Authorization': `Bearer ${token}`,

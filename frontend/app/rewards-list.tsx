@@ -79,7 +79,7 @@ export default function RewardsList() {
 
       const token = await AsyncStorage.getItem('jwt');
       
-      const response = await axios.get('http://172.20.10.2:8000/api/rewards', {
+      const response = await axios.get('http://192.168.0.31:8000/api/rewards', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
