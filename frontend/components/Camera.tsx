@@ -11,13 +11,13 @@ const Camera = forwardRef((props: any, ref) => {
   }, []);
 
   useImperativeHandle(ref, () => ({
-  takePictureAsync: async (options?: any) => {
-    if (cameraRef.current) {
-      return await cameraRef.current.takePictureAsync(options);
+    takePictureAsync: async (options?: any) => {
+      if (cameraRef.current) {
+        return await cameraRef.current.takePictureAsync(options);
+      }
+      return null;
     }
-    return null;
-  }
-}));
+  }));
 
   if (permission === null) {
     return (
@@ -43,16 +43,26 @@ const Camera = forwardRef((props: any, ref) => {
         flash={props.flash || 'off'}
         ref={cameraRef}
         onCameraReady={props.onCameraReady}
-        onBarcodeScanned={props.onBarCodeScanned}
-        barcodeScannerSettings={props.barCodeScannerSettings}
+        onBarcodeScanned={props.onBarcodeScanned}
+        barcodeScannerSettings={{
+          barcodeTypes: props.barcodeScannerSettings?.barCodeTypes || ['qr']
+        }}
       />
     </View>
   );
 });
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'black', justifyContent: 'center', alignItems: 'center' },
-  camera: { flex: 1, width: '100%' }
+  container: { 
+    flex: 1, 
+    backgroundColor: 'black', 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+  camera: { 
+    flex: 1, 
+    width: '100%' 
+  }
 });
 
 export default Camera;
