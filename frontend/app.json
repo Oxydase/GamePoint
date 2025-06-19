@@ -40,7 +40,13 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      [                    
+        "expo-camera",
+        {
+          "cameraPermission": "..."
+        }
+      ]     
     ],
     "experiments": {
       "typedRoutes": true

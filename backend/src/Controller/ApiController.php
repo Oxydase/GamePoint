@@ -53,6 +53,7 @@ final class ApiController extends AbstractController
         ]);
     }
 
+
     #[Route('/api/shop/create', name: 'api_shop_create', methods: ['POST'])]
     #[IsGranted('ROLE_MERCHANT')]
     public function createShop(Request $request, EntityManagerInterface $em): JsonResponse
