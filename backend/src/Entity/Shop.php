@@ -32,6 +32,9 @@ class Shop
     #[ORM\Column(nullable: true)]
     private ?\DateTime $updatedAt = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $banner = null;
+
     /**
      * @var Collection<int, Reward>
      */
@@ -128,6 +131,17 @@ class Shop
     {
         $this->updatedAt = $updatedAt;
 
+        return $this;
+    }
+
+    public function getBanner(): ?string
+    {
+        return $this->banner;
+    }
+
+    public function setBanner(?string $banner): self
+    {
+        $this->banner = $banner;
         return $this;
     }
 
