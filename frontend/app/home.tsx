@@ -11,6 +11,13 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from 'jwt-decode';
+
+interface DecodedToken {
+  roles: string[];
+}
+
 export default function HomeScreen() {
   const router = useRouter();
 
@@ -18,6 +25,9 @@ export default function HomeScreen() {
   const [shops, setShops] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [userRole, setUserRole] = useState<string>('');
+    
+  
   const eventsData = [
     { id: 1, title: '50 points offerts', image: 'https://via.placeholder.com/100' },
     { id: 2, title: 'Recevez 15 pts', image: 'https://via.placeholder.com/100' },
@@ -38,6 +48,29 @@ export default function HomeScreen() {
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
+
+  const checkUserRole = async () => {
+  try {
+    const token = await AsyncStorage.getItem('jwt');
+    if (token) {
+      const decoded: DecodedToken = jwtDecode(token);
+      if (decoded.roles.includes('ROLE_MERCHANT')) {
+        setUserRole('ROLE_MERCHANT');
+      } else {
+        setUserRole('ROLE_USER');
+      }
+    }
+  } catch (error) {
+    console.error('Erreur décodage JWT:', error);
+    setUserRole('ROLE_USER');
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  checkUserRole();
+}, []);
 
   return (
     <View style={styles.container}>
@@ -88,12 +121,31 @@ export default function HomeScreen() {
             />
           </View>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.scanButton}
             onPress={() => router.push('/scanqr')}
           >
             <Text style={styles.scanButtonText}>Scanner un QR Code</Text>
-          </TouchableOpacity>
+            </TouchableOpacity> */}
+
+            {userRole === 'ROLE_MERCHANT' && (
+            <TouchableOpacity
+              style={styles.scanButton}
+              onPress={() => router.push('/scanqr')}
+            >
+              <Text style={styles.scanButtonText}>📷 Scanner un QR Code</Text>
+            </TouchableOpacity>
+          )}
+
+            
+            
+            <TouchableOpacity
+              style={styles.rewardsButton}
+              onPress={() => router.push('/rewards-list')}
+            >
+              <Text style={styles.rewardsButtonText}> Mes Récompenses</Text>
+            </TouchableOpacity>
+
 
           {/* Boutiques partenaires */}
           <View style={styles.section}>
@@ -193,4 +245,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+
+  rewardsButton: {
+  backgroundColor: '#28a745',
+  marginHorizontal: 20,
+  paddingVertical: 15,
+  borderRadius: 10,
+  alignItems: 'center',
+  marginBottom: 20,
+},
+rewardsButtonText: {
+  color: '#fff',
+  fontWeight: 'bold',
+  fontSize: 16,
+},
 });
