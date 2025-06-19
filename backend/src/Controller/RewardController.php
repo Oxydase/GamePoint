@@ -38,7 +38,7 @@ class RewardController extends AbstractController
             // le solde du client pouer la boutique
             $loyaltyPoints = $em->getRepository(LoyaltyPoints::class)->findOneBy([
                 'user' => $user,
-                'shop' => $reward->getShop()
+                'shop' => $reward->getShopId()
             ]);
             
             $balance = $loyaltyPoints ? $loyaltyPoints->getPointsBalance() : 0;
@@ -112,7 +112,7 @@ class RewardController extends AbstractController
         // Vérifie le solde
         $loyaltyPoints = $em->getRepository(LoyaltyPoints::class)->findOneBy([
             'user' => $user,
-            'shop' => $reward->getShop()
+            'shop' => $reward->getShopId()
         ]);
         
         if (!$loyaltyPoints || $loyaltyPoints->getPointsBalance() < $reward->getPointsCost()) {

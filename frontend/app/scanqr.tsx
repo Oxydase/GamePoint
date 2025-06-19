@@ -11,22 +11,33 @@ export default function ScanScreen() {
   const router = useRouter();
   const cameraRef = useRef(null);
 
-  const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
-    if (!scanned && scanning) {
-      console.log(' QR Code scanné:', { type, data });
-      setScanned(true);
-      setScanning(false);
-      
-      // vibration pour confirmer le scan 
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      
-      // Navigation vers la page transaction avec les données scannées
+const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
+  if (!scanned && scanning) {
+    console.log(' QR Code scanné:', { type, data });
+    setScanned(true);
+    setScanning(false);
+    
+    // Vibration pour confirmer le scan 
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    
+    // Détection du type de QR code
+    if (data.startsWith('RWD-')) {
+      // QR Code Récompense → Validation commerçant
+      console.log('QR Récompense détecté');
+      router.replace({
+        pathname: '/boutique/validate-reward',
+        params: { rewardCode: data }
+      });
+    } else {
+      // QR Code Client → Transaction achat
+      console.log('QR Client détecté');
       router.replace({
         pathname: '/transaction',
         params: { qrCodeData: data }
       });
     }
-  };
+  }
+};
 
   const resetScan = () => {
     setScanned(false);
@@ -57,7 +68,7 @@ export default function ScanScreen() {
       <View style={styles.instructionsContainer}>
         <Text style={styles.instructionsTitle}> Scanner un QR Code Client</Text>
         <Text style={styles.instructionsText}>
-          Pointez la caméra vers le QR code du client pour l'identifier
+          Pointez la caméra vers le QR code du client pour l'identifier pour un achat ou une récompense
         </Text>
         <Text style={[styles.instructionsText, { 
           color: scanning ? '#4CAF50' : '#FF9800',
