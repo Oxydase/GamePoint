@@ -33,7 +33,8 @@ export default function PointsScreen() {
           return;
         }
 
-        const response = await axios.get('http://gamepoint-app.alwaysdata.net/api/loyalty', {
+        const response = await axios.get('http://172.20.10.2:8000/api/loyalty', {
+        // const response = await axios.get('http://gamepoint-app.alwaysdata.net/api/loyalty', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',

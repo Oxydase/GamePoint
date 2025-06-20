@@ -46,7 +46,8 @@ export default function ProfileDetails() {
       }
 
       await axios.put(
-        'http://gamepoint-app.alwaysdata.net/api/me',
+        'http://172.20.10.2:8000/api/me',
+        // 'http://gamepoint-app.alwaysdata.net/api/me',
         {
           firstname: user.prenom,
           lastname: user.nom,

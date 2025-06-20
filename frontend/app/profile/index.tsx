@@ -65,13 +65,23 @@ export default function ProfileMenu() {
       ))}
 
       {isMerchant && (
-        <TouchableOpacity
-          onPress={() => router.push('/boutique/create-store')}
-          style={[styles.item, { backgroundColor: '#e8f5e9' }]}
-        >
-          <Text style={styles.title}>Créer ma boutique</Text>
-          <Text style={styles.subtitle}>Accéder à l’espace commerçant</Text>
-        </TouchableOpacity>
+        <>
+          <TouchableOpacity
+            onPress={() => router.push('/boutique/create-store')}
+            style={[styles.item, { backgroundColor: '#e8f5e9' }]}
+          >
+            <Text style={styles.title}>Créer ma boutique</Text>
+            <Text style={styles.subtitle}>Configurer ma boutique</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push('/boutique/manage-rewards')}
+            style={[styles.item, { backgroundColor: '#e3f2fd' }]}
+          >
+            <Text style={styles.title}>Gérer mes récompenses</Text>
+            <Text style={styles.subtitle}>Ajouter, modifier, supprimer mes récompenses</Text>
+          </TouchableOpacity>
+        </>
       )}
 
       <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>

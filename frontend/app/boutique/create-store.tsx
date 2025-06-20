@@ -98,7 +98,8 @@ export default function CreateStore(): JSX.Element {
       }
 
       // Configuration axios pour multipart/form-data
-      const response = await axios.post('http://gamepoint-app.alwaysdata.net/api/shop/create', formData, {
+      const response = await axios.post('http://172.20.10.2:8000/api/shop/create', formData, {
+      // const response = await axios.post('http://gamepoint-app.alwaysdata.net/api/shop/create', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
