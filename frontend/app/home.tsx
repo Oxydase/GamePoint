@@ -208,13 +208,6 @@ export default function HomeScreen() {
         <ActivityIndicator size="large" color="#F0180C" style={{ marginTop: 40 }} />
       ) : (
         <ScrollView contentContainerStyle={styles.scroll}>
-          {/* Debug - Affichage des informations pour le développement */}
-          {__DEV__ && (
-            <View style={styles.debugInfo}>
-              <Text>Role: {userRole}</Text>
-              <Text>Ma boutique: {myShop ? myShop.name : 'Aucune'}</Text>
-            </View>
-          )}
 
           {/* Ma Boutique - Uniquement pour les marchands */}
           {userRole === 'ROLE_MERCHANT' && myShop && (
