@@ -13,6 +13,7 @@ use App\Entity\RewardExchange;
 use App\Entity\LoyaltyPoints;
 use App\Entity\Transaction;
 use App\Entity\User;
+use App\Entity\Shop;
 use App\Service\QrCodeService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -67,7 +68,64 @@ class RewardController extends AbstractController
     }
 
 
+    #[Route('/api/shops/{shopId}/rewards', name: 'api_shop_rewards', methods: ['GET'])]
+    public function getShopRewards(int $shopId, EntityManagerInterface $em): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['error' => 'Non authentifié'], 401);
+        }
 
+        // Vérifier que la boutique existe
+        $shop = $em->getRepository(Shop::class)->find($shopId);
+        if (!$shop) {
+            return $this->json(['error' => 'Boutique non trouvée'], 404);
+        }
+
+        // Récupérer les récompenses actives de cette boutique
+        $rewards = $em->getRepository(Reward::class)->findBy([
+            'shop' => $shop,
+            'isActive' => true
+        ]);
+
+        // Récupérer le solde de points de l'utilisateur pour cette boutique
+        $loyaltyPoints = $em->getRepository(LoyaltyPoints::class)->findOneBy([
+            'user' => $user,
+            'shop' => $shop
+        ]);
+        
+        $userBalance = $loyaltyPoints ? $loyaltyPoints->getPointsBalance() : 0;
+
+        $rewardsData = [];
+        foreach ($rewards as $reward) {
+            // Vérifier si l'utilisateur a déjà échangé cette récompense
+            $alreadyExchanged = $em->getRepository(RewardExchange::class)->findOneBy([
+                'user' => $user,
+                'reward' => $reward
+            ]);
+            
+            $rewardsData[] = [
+                'id' => $reward->getId(),
+                'name' => $reward->getName(),
+                'description' => $reward->getDescription(),
+                'points_cost' => $reward->getPointsCost(),
+                'quantity_available' => $reward->getQuantityAvailable(),
+                'can_redeem' => $userBalance >= $reward->getPointsCost() && !$alreadyExchanged && $reward->getQuantityAvailable() > 0,
+                'already_exchanged' => $alreadyExchanged !== null
+            ];
+        }
+
+        return $this->json([
+            'shop' => [
+                'id' => $shop->getId(),
+                'name' => $shop->getName(),
+                'address' => $shop->getAddress(),
+                'banner' => $shop->getBanner(),
+            ],
+            'user_balance' => $userBalance,
+            'rewards' => $rewardsData
+        ]);
+    }
 
 
     #[Route('/api/redeem', name: 'api_redeem', methods: ['POST'])]

@@ -29,7 +29,7 @@ export default function RewardConfirmation() {
 
       console.log('🔄 Échange de la récompense:', reward_id);
       
-      const response = await axios.post('http://172.20.10.2:8000/api/redeem', {
+      const response = await axios.post('http://192.168.0.31:8000/api/redeem', {
         reward_id: parseInt(reward_id)
       }, {
         headers: {

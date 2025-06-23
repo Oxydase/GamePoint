@@ -204,4 +204,26 @@ final class ApiController extends AbstractController
 
         return $this->json($data);
     }
+
+    #[Route('/api/shops', name: 'api_all_shops', methods: ['GET'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function getAllShops(EntityManagerInterface $em): JsonResponse
+    {
+        $shopRepository = $em->getRepository(Shop::class);
+        $shops = $shopRepository->findAll();
+
+        $data = [];
+        foreach ($shops as $shop) {
+            $data[] = [
+                'id' => $shop->getId(),
+                'name' => $shop->getName(),
+                'phone' => $shop->getPhone(),
+                'address' => $shop->getAddress(),
+                'banner' => $shop->getBanner(),
+                'created_at' => $shop->getCreatedAt()->format('Y-m-d H:i:s'),
+            ];
+        }
+
+        return $this->json($data);
+    }
 }

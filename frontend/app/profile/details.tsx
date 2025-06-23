@@ -15,7 +15,7 @@ export default function ProfileDetails() {
         const token = await AsyncStorage.getItem('jwt');
         if (!token) return;
 
-        const res = await axios.get('http://gamepoint-app.alwaysdata.net/api/me', {
+        const res = await axios.get('http://192.168.0.31:8000/api/me', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -46,8 +46,9 @@ export default function ProfileDetails() {
       }
 
       await axios.put(
-        'http://172.20.10.2:8000/api/me',
-        // 'http://gamepoint-app.alwaysdata.net/api/me',
+
+        'http://192.168.0.31:8000/api/me',
+ main
         {
           firstname: user.prenom,
           lastname: user.nom,

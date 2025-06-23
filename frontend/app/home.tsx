@@ -18,59 +18,98 @@ interface DecodedToken {
   roles: string[];
 }
 
+interface Shop {
+  id: number;
+  name: string;
+  phone: string;
+  address: string;
+  banner?: string;
+  created_at: string;
+}
+
 export default function HomeScreen() {
   const router = useRouter();
 
   const [events, setEvents] = useState([]);
-  const [shops, setShops] = useState([]);
+  const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [userRole, setUserRole] = useState<string>('');
     
-  
   const eventsData = [
     { id: 1, title: '50 points offerts', image: 'https://via.placeholder.com/100' },
     { id: 2, title: 'Recevez 15 pts', image: 'https://via.placeholder.com/100' },
-    { id: 3, title: '1 jeu d’occasion offert', image: 'https://via.placeholder.com/100' },
+    { id: 3, title: '1 jeu  offert', image: 'https://via.placeholder.com/100' },
   ];
-
-  const shopsData = [
-    { id: 1, name: 'Micromania', image: 'https://via.placeholder.com/100' },
-    { id: 2, name: 'GameCash', image: 'https://via.placeholder.com/100' },
-    { id: 3, name: 'Retro&Geek', image: 'https://via.placeholder.com/100' },
-  ];
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setEvents(eventsData);
-      setShops(shopsData);
-      setLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
 
   const checkUserRole = async () => {
-  try {
-    const token = await AsyncStorage.getItem('jwt');
-    if (token) {
-      const decoded: DecodedToken = jwtDecode(token);
-      if (decoded.roles.includes('ROLE_MERCHANT')) {
-        setUserRole('ROLE_MERCHANT');
-      } else {
-        setUserRole('ROLE_USER');
+    try {
+      const token = await AsyncStorage.getItem('jwt');
+      if (token) {
+        const decoded: DecodedToken = jwtDecode(token);
+        if (decoded.roles.includes('ROLE_MERCHANT')) {
+          setUserRole('ROLE_MERCHANT');
+        } else {
+          setUserRole('ROLE_USER');
+        }
       }
+    } catch (error) {
+      console.error('Erreur décodage JWT:', error);
+      setUserRole('ROLE_USER');
     }
-  } catch (error) {
-    console.error('Erreur décodage JWT:', error);
-    setUserRole('ROLE_USER');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
-useEffect(() => {
-  checkUserRole();
-}, []);
+  const fetchAllShops = async () => {
+    try {
+      const token = await AsyncStorage.getItem('jwt');
+      
+      if (!token) {
+        return;
+      }
+
+      const response = await fetch('http://192.168.0.31:8000/api/shops', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const shopsData = await response.json();
+        setShops(shopsData);
+      } else {
+        console.error('Erreur lors de la récupération des boutiques');
+      }
+    } catch (error) {
+      console.error('Erreur réseau:', error);
+    }
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      await checkUserRole();
+      await fetchAllShops();
+      
+      // Simuler le chargement des événements
+      const timer = setTimeout(() => {
+        setEvents(eventsData);
+        setLoading(false);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    };
+
+    loadData();
+  }, []);
+
+  const getShopImageUri = (shop: Shop) => {
+    if (shop.banner) {
+      // Remplacez par votre URL de base
+      return `http://192.168.0.31:8000/uploads/${shop.banner}`;
+    }
+    // Image par défaut
+    return 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlzKdFB5-HncSf7fwX5GikTPDI-S1TRJenaA&s';
+  };
 
   return (
     <View style={styles.container}>
@@ -95,6 +134,30 @@ useEffect(() => {
         <ActivityIndicator size="large" color="#F0180C" style={{ marginTop: 40 }} />
       ) : (
         <ScrollView contentContainerStyle={styles.scroll}>
+          {/* Ma Boutique - Uniquement pour les marchands */}
+          {userRole === 'ROLE_MERCHANT' && myShop && (
+            <View style={styles.section}>
+              <View style={styles.row}>
+                <Text style={styles.sectionTitle}>Ma Boutique</Text>
+                <Text style={styles.arrow}>→</Text>
+              </View>
+
+              <TouchableOpacity
+                style={styles.myShopContainer}
+                onPress={() => router.push(`/boutique/${myShop.id}`)}
+              >
+                <Image 
+                  source={{ uri: getShopImageUri(myShop) }} 
+                  style={styles.myShopImage} 
+                />
+                <View style={styles.myShopInfo}>
+                  <Text style={styles.myShopName}>{myShop.name}</Text>
+                  <Text style={styles.myShopAddress}>{myShop.address}</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
+
           {/* Évènements */}
           <View style={styles.section}>
             <View style={styles.row}>
@@ -121,14 +184,7 @@ useEffect(() => {
             />
           </View>
 
-          {/* <TouchableOpacity
-            style={styles.scanButton}
-            onPress={() => router.push('/scanqr')}
-          >
-            <Text style={styles.scanButtonText}>Scanner un QR Code</Text>
-            </TouchableOpacity> */}
-
-            {userRole === 'ROLE_MERCHANT' && (
+          {userRole === 'ROLE_MERCHANT' && (
             <TouchableOpacity
               style={styles.scanButton}
               onPress={() => router.push('/scanqr')}
@@ -136,16 +192,13 @@ useEffect(() => {
               <Text style={styles.scanButtonText}>📷 Scanner un QR Code</Text>
             </TouchableOpacity>
           )}
-
             
-            
-            <TouchableOpacity
-              style={styles.rewardsButton}
-              onPress={() => router.push('/rewards-list')}
-            >
-              <Text style={styles.rewardsButtonText}> Mes Récompenses</Text>
-            </TouchableOpacity>
-
+          <TouchableOpacity
+            style={styles.rewardsButton}
+            onPress={() => router.push('/rewards-list')}
+          >
+            <Text style={styles.rewardsButtonText}> Mes Récompenses</Text>
+          </TouchableOpacity>
 
           {/* Boutiques partenaires */}
           <View style={styles.section}>
@@ -161,7 +214,7 @@ useEffect(() => {
                   style={styles.circleContainer}
                   onPress={() => router.push(`/boutique/${shop.id}`)}
                 >
-                  <Image source={{ uri: shop.image }} style={styles.circle} />
+                  <Image source={{ uri: getShopImageUri(shop) }} style={styles.circle} />
                   <Text style={styles.circleText}>{shop.name}</Text>
                 </TouchableOpacity>
               ))}
@@ -207,6 +260,7 @@ const styles = StyleSheet.create({
   arrow: {
     fontSize: 20,
   },
+
   circleContainer: {
     marginRight: 15,
     alignItems: 'center',
@@ -233,12 +287,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   scanButton: {
-  backgroundColor: '#F0180C',
-  marginHorizontal: 20,
-  paddingVertical: 15,
-  borderRadius: 10,
-  alignItems: 'center',
-  marginBottom: 20,
+    backgroundColor: '#F0180C',
+    marginHorizontal: 20,
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 20,
   },
   scanButtonText: {
     color: '#fff',
@@ -247,16 +301,16 @@ const styles = StyleSheet.create({
   },
 
   rewardsButton: {
-  backgroundColor: '#28a745',
-  marginHorizontal: 20,
-  paddingVertical: 15,
-  borderRadius: 10,
-  alignItems: 'center',
-  marginBottom: 20,
-},
-rewardsButtonText: {
-  color: '#fff',
-  fontWeight: 'bold',
-  fontSize: 16,
-},
+    backgroundColor: '#28a745',
+    marginHorizontal: 20,
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  rewardsButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
 });
