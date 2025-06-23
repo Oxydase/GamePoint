@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
 import {
   View,
   Text,
@@ -248,6 +249,17 @@ export default function ManageRewards() {
   }, []);
 
 
+  // refech 
+  
+useFocusEffect(
+  useCallback(() => {
+    if (userRole === 'ROLE_MERCHANT') {
+      console.log('🔄 Page focus - Refresh des récompenses');
+      fetchRewards();
+    }
+  }, [userRole])
+);
+
 
   // Interface de chargement
   if (loading) {
@@ -266,7 +278,7 @@ export default function ManageRewards() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       <Header />
       
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
@@ -371,7 +383,7 @@ export default function ManageRewards() {
           )}
         />
       )}
-    </ScrollView>
+    </View>
   );
 }
 

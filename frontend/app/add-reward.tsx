@@ -190,18 +190,18 @@ export default function AddReward() {
 
   // Pré-remplissage en mode édition
   useEffect(() => {
-    if (isEditing && params) {
-      console.log('📝 Mode édition - Paramètres reçus:', params);
-      
-      setForm({
-        name: (params.name as string) || '',
-        description: (params.description as string) || '',
-        points_cost: (params.points_cost as string) || '',
-        quantity_available: (params.quantity_available as string) || '',
-        is_active: params.is_active === 'true'
-      });
-    }
-  }, [isEditing, params]);
+  if (isEditing && params) {
+    console.log('📝 Mode édition - Paramètres reçus:', params);
+    
+    setForm({
+      name: (params.name as string) || '',
+      description: (params.description as string) || '',
+      points_cost: (params.points_cost as string) || '',
+      quantity_available: (params.quantity_available as string) || '',
+      is_active: params.is_active === 'true'
+    });
+  }
+}, [isEditing]);
 
   // Vérification d'accès au chargement
   useEffect(() => {
