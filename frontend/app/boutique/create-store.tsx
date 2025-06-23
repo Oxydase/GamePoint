@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios, { AxiosError } from 'axios';
 import Header from '../../components/Header';
 import * as ImagePicker from 'expo-image-picker';
+import { API_ENDPOINTS } from '@/config/api';
 
 interface ImageAsset {
   uri: string;
@@ -99,8 +100,8 @@ export default function CreateStore(): JSX.Element {
 
       // Configuration axios pour multipart/form-data
 
-      const response = await axios.post('http://192.168.0.31:8000/api/shop/create', formData, {
- main
+      const response = await axios.post(API_ENDPOINTS.createShop, formData, {
+ 
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',

@@ -15,6 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import Header from '../../components/Header';
+import { API_ENDPOINTS } from '@/config/api';
 
 interface Reward {
   id: number;
@@ -79,7 +80,7 @@ export default function ManageRewards() {
       
       console.log('🔄 Récupération des récompenses de la boutique...');
 
-      const response = await axios.get('http://172.20.10.2:8000/api/shop/rewards', {
+      const response = await axios.get(API_ENDPOINTS.SHOP_REWARDS, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

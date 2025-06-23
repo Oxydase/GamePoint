@@ -15,6 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import Header from '../components/Header';
+import { API_ENDPOINTS } from '@/config/api';
 
 interface DecodedToken {
   roles: string[];
@@ -139,7 +140,7 @@ export default function AddReward() {
         console.log('➕ Création d\'une nouvelle récompense...');
         
         response = await axios.post(
-          'http://172.20.10.2:8000/api/shop/rewards',
+          API_ENDPOINTS.SHOP_REWARDS,
           requestData,
           {
             headers: {

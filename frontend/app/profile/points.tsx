@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from '../../components/Header';
 import axios from 'axios';
+import { API_ENDPOINTS } from '@/config/api';
 
 type Point = {
   id: number;
@@ -35,8 +36,8 @@ export default function PointsScreen() {
 
 
         
-        const response = await axios.get('http://192.168.0.31:8000/api/loyalty', {
- main
+        const response = await axios.get(API_ENDPOINTS.loyality, {
+
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
