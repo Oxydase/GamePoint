@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import Header from '../components/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { API_ENDPOINTS } from '@/config/api';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -13,8 +14,7 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     try {
 
-      const response = await axios.post('http://192.168.0.31:8000/api/login_check', {
-      // const response = await axios.post('http://gamepoint-app.alwaysdata.net/api/login_check', {
+      const response = await axios.post(API_ENDPOINTS.LOGIN, {
 
         email: email,  // comme dans security.yaml
         password: password,

@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import Header from '../../components/Header';
+import { API_ENDPOINTS } from '@/config/api';
 
 interface DecodedToken {
   roles: string[];
@@ -75,7 +76,7 @@ export default function ValidateReward() {
       
       console.log('🔄 Validation récompense:', rewardCode);
 
-      const response = await axios.post('http://192.168.0.31:8000/api/validate-reward', {
+      const response = await axios.post(API_ENDPOINTS.validateRewards, {
         reward_code: rewardCode
       }, {
         headers: {

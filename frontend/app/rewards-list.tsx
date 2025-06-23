@@ -15,6 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import Header from '../components/Header';
+import { API_ENDPOINTS } from '../config/api';
 
 interface Reward {
   id: number;
@@ -79,7 +80,7 @@ export default function RewardsList() {
 
       const token = await AsyncStorage.getItem('jwt');
       
-      const response = await axios.get('http://192.168.0.31:8000/api/rewards', {
+      const response = await axios.get(API_ENDPOINTS.REWARDS, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

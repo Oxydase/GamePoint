@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import Header from '../components/Header';
 import axios from 'axios';
 import { MaterialIcons } from '@expo/vector-icons';
+import { API_ENDPOINTS } from '@/config/api';
 
 export default function RegisterScreen() {
   const [email, setEmail] = useState('');
@@ -24,8 +25,7 @@ export default function RegisterScreen() {
     console.log(email, password,lastname,firstname,phone);
 
     try {
-      const response = await axios.post('http://192.168.0.31:8000/api/register', {
-      // const response = await axios.post('http://gamepoint-app.alwaysdata.net/api/register', {
+      const response = await axios.post(API_ENDPOINTS.REGISTER, {
         email,
         password,
         lastname,

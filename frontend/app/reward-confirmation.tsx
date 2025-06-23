@@ -5,6 +5,7 @@ import QRCode from 'react-native-qrcode-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
+import { API_ENDPOINTS } from '@/config/api';
 
 export default function RewardConfirmation() {
   const router = useRouter();
@@ -29,7 +30,7 @@ export default function RewardConfirmation() {
 
       console.log('🔄 Échange de la récompense:', reward_id);
       
-      const response = await axios.post('http://192.168.0.31:8000/api/redeem', {
+      const response = await axios.post(API_ENDPOINTS.redeem, {
         reward_id: parseInt(reward_id)
       }, {
         headers: {

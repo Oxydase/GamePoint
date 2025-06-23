@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
+import { API_ENDPOINTS } from '@/config/api';
 
 interface DecodedToken {
   roles: string[];
@@ -66,7 +67,7 @@ export default function HomeScreen() {
         return;
       }
 
-      const response = await fetch('http://192.168.0.31:8000/api/shops', {
+      const response = await fetch(API_ENDPOINTS.SHOP, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -104,7 +105,6 @@ export default function HomeScreen() {
 
   const getShopImageUri = (shop: Shop) => {
     if (shop.banner) {
-      // Remplacez par votre URL de base
       return `http://192.168.0.31:8000/uploads/${shop.banner}`;
     }
     // Image par défaut

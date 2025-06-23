@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import Header from '../../components/Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { API_ENDPOINTS } from '@/config/api';
 
 export default function ProfileDetails() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function ProfileDetails() {
         const token = await AsyncStorage.getItem('jwt');
         if (!token) return;
 
-        const res = await axios.get('http://192.168.0.31:8000/api/me', {
+        const res = await axios.get(API_ENDPOINTS.userinfos, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -47,8 +48,8 @@ export default function ProfileDetails() {
 
       await axios.put(
 
-        'http://192.168.0.31:8000/api/me',
- main
+        API_ENDPOINTS.userinfos,
+
         {
           firstname: user.prenom,
           lastname: user.nom,

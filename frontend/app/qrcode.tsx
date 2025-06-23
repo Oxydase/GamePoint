@@ -5,6 +5,7 @@ import QRCode from 'react-native-qrcode-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Header from '../components/Header';
+import { API_ENDPOINTS } from '@/config/api';
 
 interface UserInfo {
   firstname: string;
@@ -35,8 +36,7 @@ export default function QRCodeClient() {
       }
 
       // Appel 'API 
-      const response = await axios.get('http://192.168.0.31:8000/api/user/qr-code', {
-      // const response = await axios.get('http://gamepoint-app.alwaysdata.net/api/user/qr-code', {
+      const response = await axios.get(API_ENDPOINTS.QR_CODE, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

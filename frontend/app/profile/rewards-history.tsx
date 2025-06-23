@@ -15,6 +15,7 @@ import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import QRCode from 'react-native-qrcode-svg';
 import Header from '../../components/Header';
+import { API_ENDPOINTS } from '@/config/api';
 
 interface RewardExchange {
   code: string;
@@ -78,7 +79,7 @@ export default function RewardsHistory() {
 
       const token = await AsyncStorage.getItem('jwt');
       
-      const response = await axios.get('http://192.168.0.31:8000/api/my-rewards', {
+      const response = await axios.get(API_ENDPOINTS.myRewards, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

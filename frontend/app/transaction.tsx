@@ -4,6 +4,7 @@ import { useRouter, useLocalSearchParams  } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Header from '../components/Header';
+import { API_ENDPOINTS } from '../config/api';
 
 export default function TransactionPage() {
   const router = useRouter();
@@ -95,8 +96,8 @@ export default function TransactionPage() {
       // Appel à l'API scan
 
 
-      const response = await axios.post('http://192.168.0.31:8000/api/scan', {
- main
+      const response = await axios.post(API_ENDPOINTS.transaction, {
+ 
 
         qr_code_data: finalQrCode,
         operation_type: operationType.trim(),
