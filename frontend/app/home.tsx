@@ -17,6 +17,7 @@ import { API_ENDPOINTS } from '@/config/api';
 
 interface DecodedToken {
   roles: string[];
+  sub?: string;
 }
 
 interface Shop {
@@ -33,6 +34,7 @@ export default function HomeScreen() {
 
   const [events, setEvents] = useState([]);
   const [shops, setShops] = useState<Shop[]>([]);
+  const [myShop, setMyShop] = useState<Shop | null>(null);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<string>('');
     
@@ -45,13 +47,21 @@ export default function HomeScreen() {
   const checkUserRole = async () => {
     try {
       const token = await AsyncStorage.getItem('jwt');
+      console.log('Token récupéré:', token ? 'Présent' : 'Absent');
+      
       if (token) {
         const decoded: DecodedToken = jwtDecode(token);
+        console.log('Rôles décodés:', decoded.roles);
+        
         if (decoded.roles.includes('ROLE_MERCHANT')) {
           setUserRole('ROLE_MERCHANT');
+          console.log('Utilisateur identifié comme marchand');
         } else {
           setUserRole('ROLE_USER');
+          console.log('Utilisateur identifié comme client');
         }
+      } else {
+        setUserRole('ROLE_USER');
       }
     } catch (error) {
       console.error('Erreur décodage JWT:', error);
@@ -86,28 +96,92 @@ export default function HomeScreen() {
     }
   };
 
+  const fetchMyShop = async () => {
+    try {
+        const token = await AsyncStorage.getItem('jwt');
+        
+        if (!token) {
+            console.log('Pas de token pour récupérer ma boutique');
+            return;
+        }
+
+        console.log('Tentative de récupération de ma boutique...');
+        const response = await fetch(`${API_ENDPOINTS.ME}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        console.log('Statut de la réponse /me:', response.status);
+
+        if (response.ok) {
+            const userData = await response.json();
+            console.log('Données utilisateur reçues:', userData);
+            
+            if (userData.shop) {
+                setMyShop(userData.shop);
+                console.log('Ma boutique définie:', userData.shop);
+            } else {
+                console.log('Aucune boutique trouvée dans les données utilisateur');
+            }
+        } else {
+            const errorText = await response.text();
+            console.error('Erreur lors de la récupération des données utilisateur:', errorText);
+        }
+    } catch (error) {
+        console.error('Erreur réseau lors de la récupération de ma boutique:', error);
+    }
+  };
+
   useEffect(() => {
     const loadData = async () => {
+      console.log('Début du chargement des données');
+      
+      // 1. Vérifier le rôle utilisateur
       await checkUserRole();
+      
+      // 2. Récupérer toutes les boutiques
       await fetchAllShops();
       
-      // Simuler le chargement des événements
-      const timer = setTimeout(() => {
+      // 3. Si marchand, récupérer sa boutique
+      const token = await AsyncStorage.getItem('jwt');
+      if (token) {
+        try {
+          const decoded: DecodedToken = jwtDecode(token);
+          if (decoded.roles.includes('ROLE_MERCHANT')) {
+            console.log('Marchand détecté, récupération de sa boutique...');
+            await fetchMyShop();
+          }
+        } catch (error) {
+          console.error('Erreur lors du décodage du token dans useEffect:', error);
+        }
+      }
+      
+      // 4. Simuler le chargement des événements
+      setTimeout(() => {
         setEvents(eventsData);
         setLoading(false);
+        console.log('Chargement terminé');
       }, 1000);
-      
-      return () => clearTimeout(timer);
     };
 
     loadData();
   }, []);
 
+  // Debug: Log des états actuels
+  useEffect(() => {
+    console.log('États actuels:');
+    console.log('- userRole:', userRole);
+    console.log('- myShop:', myShop);
+    console.log('- loading:', loading);
+  }, [userRole, myShop, loading]);
+
   const getShopImageUri = (shop: Shop) => {
     if (shop.banner) {
-      return `http://192.168.0.31:8000/uploads/${shop.banner}`;
+      return `http://gamepoint-app.alwaysdata.net/uploads/${shop.banner}`;
     }
-    // Image par défaut
     return 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlzKdFB5-HncSf7fwX5GikTPDI-S1TRJenaA&s';
   };
 
@@ -134,6 +208,14 @@ export default function HomeScreen() {
         <ActivityIndicator size="large" color="#F0180C" style={{ marginTop: 40 }} />
       ) : (
         <ScrollView contentContainerStyle={styles.scroll}>
+          {/* Debug - Affichage des informations pour le développement */}
+          {__DEV__ && (
+            <View style={styles.debugInfo}>
+              <Text>Role: {userRole}</Text>
+              <Text>Ma boutique: {myShop ? myShop.name : 'Aucune'}</Text>
+            </View>
+          )}
+
           {/* Ma Boutique - Uniquement pour les marchands */}
           {userRole === 'ROLE_MERCHANT' && myShop && (
             <View style={styles.section}>
@@ -155,6 +237,15 @@ export default function HomeScreen() {
                   <Text style={styles.myShopAddress}>{myShop.address}</Text>
                 </View>
               </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Message si marchand sans boutique */}
+          {userRole === 'ROLE_MERCHANT' && !myShop && (
+            <View style={styles.section}>
+              <Text style={styles.noShopMessage}>
+                Aucune boutique associée à votre compte marchand.
+              </Text>
             </View>
           )}
 
@@ -312,5 +403,47 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+
+  myShopContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 10,
+    padding: 15,
+    alignItems: 'center',
+  },
+  myShopImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 15,
+  },
+  myShopInfo: {
+    flex: 1,
+  },
+  myShopName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  myShopAddress: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 5,
+  },
+
+  // Styles de debug
+  debugInfo: {
+    backgroundColor: '#f0f0f0',
+    padding: 10,
+    margin: 20,
+    borderRadius: 5,
+  },
+
+  noShopMessage: {
+    textAlign: 'center',
+    color: '#666',
+    fontStyle: 'italic',
+    padding: 20,
   },
 });

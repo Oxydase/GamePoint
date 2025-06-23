@@ -68,8 +68,8 @@ class RewardController extends AbstractController
     }
 
 
-    #[Route('/api/shops/{shopId}/rewards', name: 'api_shop_rewards', methods: ['GET'])]
-    public function getShopRewards(int $shopId, EntityManagerInterface $em): JsonResponse
+    #[Route('/api/shops/{shopId}/rewards', name: 'api_shop_rewards2', methods: ['GET'])]
+    public function getShopRewards2(int $shopId, EntityManagerInterface $em): JsonResponse
     {
         $user = $this->getUser();
         if (!$user) {

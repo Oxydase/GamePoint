@@ -139,7 +139,7 @@ export default function ManageRewards() {
       
       console.log(`🗑️ Suppression de la récompense ${rewardId}...`);
 
-      await axios.delete(`http://172.20.10.2:8000/api/shop/rewards/${rewardId}`, {
+      await axios.delete(`http://gamepoint-app.alwaysdata.net/api/shop/rewards/${rewardId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -202,7 +202,7 @@ export default function ManageRewards() {
                 console.log(`🔄 Toggle récompense ${reward.id}...`);
 
                 const response = await axios.patch(
-                  `http://172.20.10.2:8000/api/shop/rewards/${reward.id}/toggle`,
+                  `http://gamepoint-app.alwaysdata.net/api/shop/rewards/${reward.id}/toggle`,
                   {},
                   {
                     headers: {

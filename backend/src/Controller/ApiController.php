@@ -20,14 +20,31 @@ final class ApiController extends AbstractController
     public function me(): JsonResponse
     {
         $user = $this->getUser();
-
-        return $this->json([
+        
+        $userData = [
             'id' => $user->getId(),
             'email' => $user->getEmail(),
             'lastname' => $user->getLastname(),
             'firstname' => $user->getFirstname(),
             'phone' => $user->getPhone(),
-        ]);
+            'roles' => $user->getRoles(),
+            'shop' => null
+        ];
+        
+        // Si l'utilisateur a une boutique, l'inclure
+        if ($user->getShop()) {
+            $shop = $user->getShop();
+            $userData['shop'] = [
+                'id' => $shop->getId(),
+                'name' => $shop->getName(),
+                'phone' => $shop->getPhone(),
+                'address' => $shop->getAddress(),
+                'banner' => $shop->getBanner(),
+                'created_at' => $shop->getCreatedAt()->format('Y-m-d H:i:s'),
+            ];
+        }
+        
+        return $this->json($userData);
     }
 
     #[Route('/api/me', name: 'api_me_update', methods: ['PUT'])]

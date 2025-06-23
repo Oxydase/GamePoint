@@ -11,7 +11,7 @@ export default function BoutiqueScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_BASE_URL = 'http://192.168.0.31:8000';
+  const API_BASE_URL = 'http://gamepoint-app.alwaysdata.net';
 
   const getAuthToken = async () => {
     const token = await AsyncStorage.getItem('jwt');
@@ -45,7 +45,7 @@ export default function BoutiqueScreen() {
         name: data.shop.name,
         address: data.shop.address,
         cover: data.shop.banner
-          ? `http://192.168.0.31:8000/uploads/${data.shop.banner}`
+          ? `http://gamepoint-app.alwaysdata.net/uploads/${data.shop.banner}`
           : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlzKdFB5-HncSf7fwX5GikTPDI-S1TRJenaA&s',
         points: data.user_balance,
         avantages: data.rewards.map(reward => ({

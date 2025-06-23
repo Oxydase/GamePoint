@@ -3,11 +3,11 @@ const API_CONFIG = {
   // URLs par environnement
   LOCAL: 'http://172.20.10.2:8000',
   DEVELOPMENT: 'http://192.168.1.13:8000', 
-  PRODUCTION: 'https://gamepoint-api.com',
+  PRODUCTION: 'http://gamepoint-app.alwaysdata.net',
 };
 
 const getApiUrl = () => {
-  return API_CONFIG.LOCAL; 
+  return API_CONFIG.PRODUCTION; 
 };
 
 export const API_URL = getApiUrl();
@@ -25,7 +25,8 @@ export const API_ENDPOINTS = {
   myRewards: `${API_URL}/api/my-rewards`,
   loyality: `${API_URL}/api/loyalty`,
   userinfos: `${API_URL}/api/me`,
-  validateRewards: `${API_URL}/api/validate-reward`
+  validateRewards: `${API_URL}/api/validate-reward`,
+  ME : `${API_URL}/api/me`
 
 
 };
