@@ -20,7 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 class RewardController extends AbstractController
 {
     #[Route('/api/rewards', name: 'api_rewards', methods: ['GET'])]
@@ -342,4 +342,245 @@ class RewardController extends AbstractController
         return $this->json(['exchanges' => $exchangesData]);
     }
 
+
+
+
+
+    // Manage rewards 
+
+
+    // Get all rewards for a merchant's shop
+    #[Route('/api/shop/rewards', name: 'api_shop_rewards', methods: ['GET'])]
+    public function getShopRewards(EntityManagerInterface $em): JsonResponse
+    {
+        $merchant = $this->getUser();
+        
+        if (!$merchant || !in_array('ROLE_MERCHANT', $merchant->getRoles())) {
+            return $this->json(['error' => 'Accès refusé - Commerçant requis'], 403);
+        }
+        
+        if (!$merchant->getShop()) {
+            return $this->json(['error' => 'Commerçant sans boutique assignée'], 400);
+        }
+        
+        $rewards = $em->getRepository(Reward::class)->findBy([
+            'shop' => $merchant->getShop()
+        ], ['createdAt' => 'DESC']);
+        
+        $rewardsData = [];
+        foreach ($rewards as $reward) {
+            $rewardsData[] = [
+                'id' => $reward->getId(),
+                'name' => $reward->getName(),
+                'description' => $reward->getDescription(),
+                'points_cost' => $reward->getPointsCost(),
+                'quantity_available' => $reward->getQuantityAvailable(),
+                'is_active' => $reward->isActive(),
+                'created_at' => $reward->getCreatedAt()->format('Y-m-d H:i:s')
+            ];
+        }
+        
+        return $this->json(['rewards' => $rewardsData]);
+    }
+
+
+    // Add a new reward
+    #[Route('/api/shop/rewards', name: 'api_shop_rewards_create', methods: ['POST'])]
+    public function createReward(
+        Request $request,
+        EntityManagerInterface $em,
+        ValidatorInterface $validator
+    ): JsonResponse {
+        $merchant = $this->getUser();
+        
+        if (!$merchant || !in_array('ROLE_MERCHANT', $merchant->getRoles())) {
+            return $this->json(['error' => 'Accès refusé - Commerçant requis'], 403);
+        }
+        
+        if (!$merchant->getShop()) {
+            return $this->json(['error' => 'Commerçant sans boutique assignée'], 400);
+        }
+        
+        $data = json_decode($request->getContent(), true);
+        
+        $requiredFields = ['name', 'description', 'points_cost', 'quantity_available'];
+        foreach ($requiredFields as $field) {
+            if (!isset($data[$field]) || empty($data[$field])) {
+                return $this->json(['error' => "Le champ '$field' est requis"], 400);
+            }
+        }
+        
+        $reward = new Reward();
+        $reward->setName($data['name']);
+        $reward->setDescription($data['description']);
+        $reward->setPointsCost((int) $data['points_cost']);
+        $reward->setQuantityAvailable((int) $data['quantity_available']);
+        $reward->setIsActive(true);
+        $reward->setShopId($merchant->getShop());
+        $reward->setCreatedAt(new \DateTime());
+        
+        $errors = $validator->validate($reward);
+        if (count($errors) > 0) {
+            return $this->json(['errors' => (string) $errors], 400);
+        }
+        
+        $em->persist($reward);
+        $em->flush();
+        
+        return $this->json([
+            'message' => 'Récompense créée avec succès',
+            'reward' => [
+                'id' => $reward->getId(),
+                'name' => $reward->getName(),
+                'description' => $reward->getDescription(),
+                'points_cost' => $reward->getPointsCost(),
+                'quantity_available' => $reward->getQuantityAvailable()
+            ]
+        ], 201);
+    }
+
+
+    // Modify an existing reward
+    #[Route('/api/shop/rewards/{id}', name: 'api_shop_rewards_update', methods: ['PUT'])]
+    public function updateReward(
+        int $id,
+        Request $request,
+        EntityManagerInterface $em,
+        ValidatorInterface $validator
+    ): JsonResponse {
+        $merchant = $this->getUser();
+        
+        if (!$merchant || !in_array('ROLE_MERCHANT', $merchant->getRoles())) {
+            return $this->json(['error' => 'Accès refusé - Commerçant requis'], 403);
+        }
+        
+        if (!$merchant->getShop()) {
+            return $this->json(['error' => 'Commerçant sans boutique assignée'], 400);
+        }
+        
+        $reward = $em->getRepository(Reward::class)->find($id);
+        
+        if (!$reward) {
+            return $this->json(['error' => 'Récompense non trouvée'], 404);
+        }
+        
+        // Vérifie que la récompense appartient à la boutique du commerçant
+        if ($reward->getShopId()->getId() !== $merchant->getShop()->getId()) {
+            return $this->json(['error' => 'Cette récompense ne vous appartient pas'], 403);
+        }
+        
+        $data = json_decode($request->getContent(), true);
+        
+        if (isset($data['name'])) {
+            $reward->setName($data['name']);
+        }
+        if (isset($data['description'])) {
+            $reward->setDescription($data['description']);
+        }
+        if (isset($data['points_cost'])) {
+            $reward->setPointsCost((int) $data['points_cost']);
+        }
+        if (isset($data['quantity_available'])) {
+            $reward->setQuantityAvailable((int) $data['quantity_available']);
+        }
+        if (isset($data['is_active'])) {
+            $reward->setIsActive((bool) $data['is_active']);
+        }
+        
+        $errors = $validator->validate($reward);
+        if (count($errors) > 0) {
+            return $this->json(['errors' => (string) $errors], 400);
+        }
+        
+        $em->flush();
+        
+        return $this->json([
+            'message' => 'Récompense modifiée avec succès',
+            'reward' => [
+                'id' => $reward->getId(),
+                'name' => $reward->getName(),
+                'description' => $reward->getDescription(),
+                'points_cost' => $reward->getPointsCost(),
+                'quantity_available' => $reward->getQuantityAvailable(),
+                'is_active' => $reward->isActive()
+            ]
+        ]);
+    }
+
+    // Delete a reward
+    #[Route('/api/shop/rewards/{id}', name: 'api_shop_rewards_delete', methods: ['DELETE'])]
+    public function deleteReward(
+        int $id,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $merchant = $this->getUser();
+        
+        if (!$merchant || !in_array('ROLE_MERCHANT', $merchant->getRoles())) {
+            return $this->json(['error' => 'Accès refusé - Commerçant requis'], 403);
+        }
+        
+        if (!$merchant->getShop()) {
+            return $this->json(['error' => 'Commerçant sans boutique assignée'], 400);
+        }
+        
+        $reward = $em->getRepository(Reward::class)->find($id);
+        
+        if (!$reward) {
+            return $this->json(['error' => 'Récompense non trouvée'], 404);
+        }
+        
+        // Vérifier que la récompense appartient à la boutique du commerçant
+        if ($reward->getShopId()->getId() !== $merchant->getShop()->getId()) {
+            return $this->json(['error' => 'Cette récompense ne vous appartient pas'], 403);
+        }
+        
+        // Vérifier s'il y a des échanges en cours
+        $activeExchanges = $em->getRepository(RewardExchange::class)->findBy([
+            'reward' => $reward,
+            'status' => 'pending'
+        ]);
+        
+        if (count($activeExchanges) > 0) {
+            return $this->json([
+                'error' => 'Impossible de supprimer cette récompense car des échanges sont en cours'
+            ], 409);
+        }
+        
+        $rewardName = $reward->getName();
+        $em->remove($reward);
+        $em->flush();
+        
+        return $this->json([
+            'message' => "Récompense '$rewardName' supprimée avec succès"
+        ]);
+    }
+
+    // Activate/Deactivate a reward
+    #[Route('/api/shop/rewards/{id}/toggle', name: 'api_shop_rewards_toggle', methods: ['PATCH'])]
+    public function toggleReward(
+        int $id,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $merchant = $this->getUser();
+        
+        if (!$merchant || !in_array('ROLE_MERCHANT', $merchant->getRoles())) {
+            return $this->json(['error' => 'Accès refusé - Commerçant requis'], 403);
+        }
+        
+        $reward = $em->getRepository(Reward::class)->find($id);
+        
+        if (!$reward || $reward->getShopId()->getId() !== $merchant->getShop()->getId()) {
+            return $this->json(['error' => 'Récompense non trouvée'], 404);
+        }
+        
+        $reward->setIsActive(!$reward->isActive());
+        $em->flush();
+        
+        $status = $reward->isActive() ? 'activée' : 'désactivée';
+        
+        return $this->json([
+            'message' => "Récompense $status avec succès",
+            'is_active' => $reward->isActive()
+        ]);
+    }
 }

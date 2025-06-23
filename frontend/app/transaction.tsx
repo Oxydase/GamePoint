@@ -94,7 +94,9 @@ export default function TransactionPage() {
 
       // Appel à l'API scan
 
+
       const response = await axios.post('http://192.168.0.31:8000/api/scan', {
+ main
 
         qr_code_data: finalQrCode,
         operation_type: operationType.trim(),

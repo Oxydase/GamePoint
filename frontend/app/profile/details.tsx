@@ -46,7 +46,9 @@ export default function ProfileDetails() {
       }
 
       await axios.put(
+
         'http://192.168.0.31:8000/api/me',
+ main
         {
           firstname: user.prenom,
           lastname: user.nom,

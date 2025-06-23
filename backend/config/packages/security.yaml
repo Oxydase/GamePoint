@@ -40,6 +40,7 @@ security:
         - { path: ^/api/scan, roles: ROLE_MERCHANT }
         - { path: ^/api/validate-reward, roles: ROLE_MERCHANT } 
         - { path: ^/api/shop/create, roles: ROLE_MERCHANT }
+        - { path: ^/api/shop/rewards, roles: ROLE_MERCHANT }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
