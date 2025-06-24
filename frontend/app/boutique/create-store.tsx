@@ -169,8 +169,6 @@ export default function CreateStore(): JSX.Element {
         style={[styles.input, styles.textArea]}
         placeholder="Adresse complète"
         placeholderTextColor="#888"
-        multiline
-        numberOfLines={3}
         value={address}
         onChangeText={setAddress}
         maxLength={200}

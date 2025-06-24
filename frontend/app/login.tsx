@@ -62,6 +62,7 @@ export default function LoginScreen() {
 
         <TextInput
           placeholder="Email"
+          placeholderTextColor="#888"
           style={styles.input}
           keyboardType="email-address"
           autoCapitalize="none"
@@ -70,6 +71,7 @@ export default function LoginScreen() {
         />
         <TextInput
           placeholder="Mot de passe"
+          placeholderTextColor="#888"
           style={styles.input}
           secureTextEntry
           value={password}

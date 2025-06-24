@@ -9,7 +9,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native'; // Ajout de l'import
 import { Ionicons } from '@expo/vector-icons';
+import { useCallback } from 'react'; // Ajout de l'import
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
@@ -39,9 +41,9 @@ export default function HomeScreen() {
   const [userRole, setUserRole] = useState<string>('');
     
   const eventsData = [
-    { id: 1, title: '50 points offerts', image: 'https://via.placeholder.com/100' },
-    { id: 2, title: 'Recevez 15 pts', image: 'https://via.placeholder.com/100' },
-    { id: 3, title: '1 jeu  offert', image: 'https://via.placeholder.com/100' },
+    { id: 1, title: '50 points offerts', image: 'https://t4.ftcdn.net/jpg/06/09/38/37/360_F_609383713_xGhLpiQjRrNcVfCKyhNA027aVPHjpDkg.jpg' },
+    { id: 2, title: 'Recevez 15 pts', image: 'https://t4.ftcdn.net/jpg/06/09/38/37/360_F_609383713_xGhLpiQjRrNcVfCKyhNA027aVPHjpDkg.jpg' },
+    { id: 3, title: '1 jeu  offert', image: 'https://www.creativefabrica.com/wp-content/uploads/2019/02/Gift-Icon-by-arus-1.jpg' },
   ];
 
   const checkUserRole = async () => {
@@ -125,6 +127,7 @@ export default function HomeScreen() {
                 console.log('Ma boutique définie:', userData.shop);
             } else {
                 console.log('Aucune boutique trouvée dans les données utilisateur');
+                setMyShop(null); // Important : réinitialiser à null si pas de boutique
             }
         } else {
             const errorText = await response.text();
@@ -135,40 +138,44 @@ export default function HomeScreen() {
     }
   };
 
-  useEffect(() => {
-    const loadData = async () => {
-      console.log('Début du chargement des données');
-      
-      // 1. Vérifier le rôle utilisateur
-      await checkUserRole();
-      
-      // 2. Récupérer toutes les boutiques
-      await fetchAllShops();
-      
-      // 3. Si marchand, récupérer sa boutique
-      const token = await AsyncStorage.getItem('jwt');
-      if (token) {
-        try {
-          const decoded: DecodedToken = jwtDecode(token);
-          if (decoded.roles.includes('ROLE_MERCHANT')) {
-            console.log('Marchand détecté, récupération de sa boutique...');
-            await fetchMyShop();
-          }
-        } catch (error) {
-          console.error('Erreur lors du décodage du token dans useEffect:', error);
+  const loadData = useCallback(async () => {
+    console.log('Début du chargement des données');
+    setLoading(true);
+    
+    // 1. Vérifier le rôle utilisateur
+    await checkUserRole();
+    
+    // 2. Récupérer toutes les boutiques
+    await fetchAllShops();
+    
+    // 3. Si marchand, récupérer sa boutique
+    const token = await AsyncStorage.getItem('jwt');
+    if (token) {
+      try {
+        const decoded: DecodedToken = jwtDecode(token);
+        if (decoded.roles.includes('ROLE_MERCHANT')) {
+          console.log('Marchand détecté, récupération de sa boutique...');
+          await fetchMyShop();
         }
+      } catch (error) {
+        console.error('Erreur lors du décodage du token dans loadData:', error);
       }
-      
-      // 4. Simuler le chargement des événements
-      setTimeout(() => {
-        setEvents(eventsData);
-        setLoading(false);
-        console.log('Chargement terminé');
-      }, 1000);
-    };
-
-    loadData();
+    }
+    
+    // 4. Simuler le chargement des événements
+    setTimeout(() => {
+      setEvents(eventsData);
+      setLoading(false);
+      console.log('Chargement terminé');
+    }, 1000);
   }, []);
+
+  // Utilisation de useFocusEffect au lieu de useEffect
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [loadData])
+  );
 
   // Debug: Log des états actuels
   useEffect(() => {
