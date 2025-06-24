@@ -13,6 +13,7 @@ export default function RegisterScreen() {
   const [firstname, setFirstname] = useState('');
   const [phone, setPhone] = useState('');
   const [isMerchant, setIsMerchant] = useState(false);
+  const [rgpdAccepted, setRgpdAccepted] = useState(false);
 
   const router = useRouter();
 
@@ -24,6 +25,10 @@ export default function RegisterScreen() {
 
     console.log(email, password,lastname,firstname,phone);
 
+    if (!rgpdAccepted) {
+      Alert.alert('RGPD obligatoire', 'Vous devez accepter les conditions de traitement des données pour créer un compte.');
+      return;
+    }
     try {
       const response = await axios.post(API_ENDPOINTS.REGISTER, {
         email,
@@ -31,7 +36,8 @@ export default function RegisterScreen() {
         lastname,
         firstname,
         phone,
-        is_merchant: isMerchant
+        is_merchant: isMerchant,
+        rgpd_accepted: rgpdAccepted
       });
 
 
@@ -118,6 +124,24 @@ export default function RegisterScreen() {
           </View>
         </TouchableOpacity>
 
+        <View style={styles.rgpdContainer}>
+        <TouchableOpacity
+          onPress={() => setRgpdAccepted(!rgpdAccepted)}
+          style={styles.rgpdCheckbox}
+        >
+          <MaterialIcons
+            name={rgpdAccepted ? 'check-box' : 'check-box-outline-blank'}
+            size={20}
+            color={rgpdAccepted ? '#28a745' : '#ccc'}
+          />
+          <Text style={styles.rgpdText}>
+             J'accepte que GamePoint traite mes données personnelles (nom, email, téléphone) 
+  pour gérer mon programme de fidélité  conformément à la{' '}
+            <Text style={styles.rgpdLink}>politique de confidentialité</Text> *
+          </Text>
+        </TouchableOpacity>
+      </View>
+
         <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>S’inscrire</Text>
         </TouchableOpacity>
@@ -148,4 +172,24 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   buttonText: { color: '#fff', textAlign: 'center', fontWeight: 'bold' },
+
+  rgpdContainer: {
+  marginBottom: 20,
+  paddingHorizontal: 5,
+},
+rgpdCheckbox: {
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+},
+rgpdText: {
+  flex: 1,
+  fontSize: 12,
+  color: '#333',
+  marginLeft: 8,
+  lineHeight: 16,
+},
+rgpdLink: {
+  color: '#007bff',
+  textDecorationLine: 'underline',
+},
 });

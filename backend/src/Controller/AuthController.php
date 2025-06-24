@@ -37,6 +37,11 @@ final class AuthController extends AbstractController
         // recuperation des donnée JSON 
         $data = json_decode($request->getContent(), true);
 
+                
+        if (empty($data['rgpd_accepted']) || !$data['rgpd_accepted']) {
+        return $this->json(['error' => 'L\'acceptation RGPD est obligatoire'], 400);
+        }
+
         // nouveau user
         $user = new User();
         $user->setEmail($data['email']);
@@ -63,7 +68,7 @@ final class AuthController extends AbstractController
         }
 
         // sauvegarde
-
+        $user->setGpdrAcceptedAt(new \DateTime());
         $entityManager->persist($user);
         $entityManager->flush();
 
