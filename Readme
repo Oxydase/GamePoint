@@ -1,0 +1,368 @@
+# GamePoint
+
+GamePoint est une application mobile de fidélisation dédiée aux magasins de jeux vidéo. Elle permet aux commerçants de scanner les QR codes des clients et d'attribuer automatiquement des points de fidélité basés sur leurs achats.
+
+## Table des matières
+
+- [Fonctionnalités](#fonctionnalités)
+- [Technologies utilisées](#technologies-utilisées)
+- [Architecture](#architecture)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Utilisation](#utilisation)
+- [API Endpoints](#api-endpoints)
+- [Structure du projet](#structure-du-projet)
+- [Sécurité](#sécurité)
+- [Contribution](#contribution)
+- [Licence](#licence)
+
+## Fonctionnalités
+
+### Pour les commerçants
+- Authentification sécurisée avec JWT
+- Scanner de QR codes clients avec overlay visuel
+- Saisie manuelle en cas de problème de scan
+- Attribution automatique de points (1€ = 1 point)
+- Gestion des transactions avec validation
+- Interface intuitive avec retours haptiques
+
+### Pour les clients
+- Inscription et génération automatique de QR code unique
+- Email de bienvenue avec logo
+- Système de points de fidélité par magasin
+
+### Système
+- API REST complète avec Symfony
+- Gestion des erreurs robuste
+- Navigation mobile optimisée
+- Support multi-magasins
+
+## Technologies utilisées
+
+### Frontend Mobile
+- **React Native** - Framework cross-platform
+- **Expo** - Plateforme de développement
+- **TypeScript** - Typage statique
+- **Expo Router** - Navigation
+- **Expo Camera** - Scanner QR codes
+- **AsyncStorage** - Stockage local
+- **Axios** - Client HTTP
+- **Expo Haptics** - Retours tactiles
+
+### Backend
+- **Symfony 6** - Framework PHP
+- **PHP 8+** - Langage serveur
+- **Doctrine ORM** - Mapping objet-relationnel
+- **JWT** - Authentification
+- **MySQL/PostgreSQL** - Base de données
+- **Symfony Mailer** - Envoi d'emails
+
+## Architecture
+
+L'application suit une architecture client-serveur avec une API REST.
+
+```
+GamePoint/
+├── frontend/           # Application React Native
+│   ├── app/           # Pages et navigation
+│   ├── components/    # Composants réutilisables
+│   └── assets/        # Ressources statiques
+├── backend/           # API Symfony
+│   ├── src/          # Code source PHP
+│   ├── config/       # Configuration
+│   └── migrations/   # Migrations base de données
+└── docs/             # Documentation
+```
+
+## Installation
+
+### Prérequis
+- Node.js 18+
+- PHP 8.1+
+- Composer
+- MySQL ou PostgreSQL
+- Expo CLI
+
+### Backend (Symfony)
+
+```bash
+# Cloner le projet
+git clone https://github.com/votre-username/gamepoint.git
+cd gamepoint/backend
+
+# Installer les dépendances
+composer install
+
+# Configuration de la base de données
+cp .env .env.local
+# Modifier DATABASE_URL dans .env.local
+
+# Créer la base de données
+php bin/console doctrine:database:create
+php bin/console doctrine:migrations:migrate
+
+# Démarrer le serveur
+symfony server:start
+# ou
+php -S localhost:8000 -t public/
+```
+
+### Frontend (React Native)
+
+```bash
+cd ../frontend
+
+# Installer les dépendances
+npm install
+# ou
+yarn install
+
+# Démarrer l'application
+npx expo start
+
+# Pour tester sur appareil
+npx expo start --tunnel
+```
+
+## Configuration
+
+### Backend (.env.local)
+```env
+DATABASE_URL="mysql://user:password@127.0.0.1:3306/gamepoint"
+JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem
+JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem
+MAILER_DSN=smtp://localhost:1025
+```
+
+### Frontend (app.json)
+```json
+{
+  "expo": {
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Permettre à GamePoint d'utiliser votre caméra pour scanner les QR codes."
+        }
+      ]
+    ]
+  }
+}
+```
+
+## Utilisation
+
+### Inscription commerçant
+1. Créer un compte avec le rôle "merchant"
+2. Associer le compte à une boutique
+3. Se connecter pour obtenir le token JWT
+
+### Scanner un client
+1. Ouvrir l'application
+2. Naviguer vers le scanner
+3. Pointer la caméra vers le QR code du client
+4. Saisir les détails de la transaction
+5. Valider pour attribuer les points
+
+### Saisie manuelle
+1. Cliquer sur "Saisie manuelle"
+2. Taper le code QR du client
+3. Compléter la transaction normalement
+
+## API Endpoints
+
+### Authentification
+```http
+POST /api/register
+POST /api/login
+GET  /api/user/qr-code
+```
+
+### Transactions
+```http
+POST /api/scan
+```
+
+### Exemple de requête
+```json
+POST /api/scan
+Authorization: Bearer {jwt_token}
+Content-Type: application/json
+
+{
+  "qr_code_data": "user-uuid-123",
+  "operation_type": "Achat FIFA 25",
+  "prix_total": 67.50
+}
+```
+
+### Exemple de réponse
+```json
+{
+  "success": true,
+  "message": "Points attribués avec succès",
+  "transaction": {
+    "client": "John Doe",
+    "client_email": "john@example.com",
+    "operation_type": "Achat FIFA 25",
+    "points_awarded": 67,
+    "new_balance": 234,
+    "shop": "GameStore Paris",
+    "transaction_date": "2024-01-15 14:30:00"
+  }
+}
+```
+
+## Structure du projet
+
+### Frontend
+```
+app/
+├── (tabs)/
+│   ├── index.tsx          # Page d'accueil
+│   └── _layout.tsx        # Layout des onglets
+├── scanqr.tsx             # Scanner QR codes
+├── transaction.tsx        # Formulaire transaction
+├── login.tsx              # Authentification
+└── _layout.tsx            # Layout principal
+
+components/
+├── Camera.tsx             # Composant caméra
+└── Header.tsx             # En-tête application
+```
+
+### Backend
+```
+src/
+├── Controller/
+│   ├── AuthController.php     # Authentification
+│   └── ScanController.php     # Gestion des scans
+├── Entity/
+│   ├── User.php              # Entité utilisateur
+│   ├── Shop.php              # Entité boutique
+│   ├── Transaction.php       # Entité transaction
+│   └── LoyaltyPoints.php     # Points de fidélité
+└── Repository/               # Repositories Doctrine
+```
+
+## Sécurité
+
+### Authentification
+- Tokens JWT avec expiration
+- Hashage des mots de passe avec bcrypt
+- Vérification des rôles côté serveur
+
+### Validation
+- Validation des données d'entrée
+- Protection contre l'injection SQL via Doctrine
+- Timeouts sur les requêtes HTTP
+
+### Permissions
+- Seuls les commerçants peuvent scanner
+- Chaque commerçant est lié à sa boutique
+- Les clients ne peuvent voir que leurs propres données
+
+## Base de données
+
+### Schéma principal
+```sql
+-- Table des utilisateurs
+users (
+  id INT PRIMARY KEY,
+  email VARCHAR(255) UNIQUE,
+  firstname VARCHAR(100),
+  lastname VARCHAR(100),
+  roles JSON,
+  qr_code VARCHAR(255) UNIQUE,
+  password VARCHAR(255),
+  created_at TIMESTAMP
+);
+
+-- Table des transactions
+transactions (
+  id INT PRIMARY KEY,
+  user_id INT FOREIGN KEY,
+  shop_id INT FOREIGN KEY,
+  operation_type VARCHAR(255),
+  point_amount INT,
+  transaction_date TIMESTAMP,
+  created_at TIMESTAMP
+);
+
+-- Table des points de fidélité
+loyalty_points (
+  id INT PRIMARY KEY,
+  user_id INT FOREIGN KEY,
+  shop_id INT FOREIGN KEY,
+  points_balance INT,
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP
+);
+```
+
+## Tests
+
+### Lancer les tests backend
+```bash
+cd backend
+php bin/phpunit
+```
+
+### Tester l'application mobile
+```bash
+cd frontend
+npm test
+```
+
+## Déploiement
+
+### Backend
+1. Configurer le serveur web (Apache/Nginx)
+2. Installer les dépendances production
+3. Exécuter les migrations
+4. Configurer les variables d'environnement
+
+### Frontend
+```bash
+# Build pour production
+npx expo build:android
+npx expo build:ios
+
+# Ou utiliser EAS Build
+eas build --platform all
+```
+
+## Contribution
+
+1. Fork le projet
+2. Créer une branche feature (`git checkout -b feature/amazing-feature`)
+3. Commit les changements (`git commit -m 'Add amazing feature'`)
+4. Push vers la branche (`git push origin feature/amazing-feature`)
+5. Ouvrir une Pull Request
+
+### Standards de code
+- PSR-12 pour PHP
+- ESLint + Prettier pour TypeScript
+- Commentaires en français
+- Tests obligatoires pour les nouvelles fonctionnalités
+
+## Licence
+
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+## Support
+
+Pour toute question ou problème :
+- Ouvrir une issue sur GitHub
+- Contacter l'équipe de développement
+- Consulter la documentation dans `/docs`
+
+## Auteurs
+
+- **Équipe GamePoint** - Développement initial
+
+## Remerciements
+
+- Expo team pour les outils de développement
+- Symfony community pour le framework backend
+- Tous les contributeurs du projet
